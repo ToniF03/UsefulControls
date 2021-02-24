@@ -15,7 +15,6 @@ namespace TagLib.ID3
     class Mp3File
     {
         public FileInfo fileInfo;
-        public MpegInfo mpegInfo;
         public ID3v1Tag Tag1;
         public ID3v2Tag Tag2;
         
@@ -190,7 +189,6 @@ namespace TagLib.ID3
             this.fileInfo = new System.IO.FileInfo(argFilePath);
             this.Tag1 = new ID3v1Tag(this.fileInfo);
             this.Tag2 = new ID3v2Tag(this.fileInfo);
-            this.mpegInfo = new MpegInfo(this.fileInfo, Convert.ToInt32(this.Tag2.TagSize));
         }
     }
 }
