@@ -47,310 +47,79 @@ class Math
             }
         }
 
-        public static double CalculateString(string task)
+public static double CalculateString(string task)
         {
-            double _result = 0;
-            string _task = task;
+                string _task = task;
+                Regex regex = new Regex(@"(\((\d{1,}[+\/\-\*]\d{1,})\))(?!.*\1)");
 
-            while (_task.Contains("(") && _task.Contains(")"))
-            {
-                for (int Index = _task.Length - 1; Index >= 0; Index--)
+                while (regex.IsMatch(_task))
                 {
-                    if (_task.Substring(Index, 1) == "(")
+                    string intermediateTask = regex.Match(_task).ToString();
+                    _task = _task.Replace(intermediateTask, CalculateString(intermediateTask.Substring(1, intermediateTask.Length - 2)).ToString());
+                }
+
+                regex = new Regex(@"(\d{1,}[\/\*]\d{1,})");
+                string intermediateTask2 = regex.Match(_task).ToString();
+
+                while (_task.Contains('*') || _task.Contains('/'))
+                {
+                    if (intermediateTask2.Contains("/"))
                     {
-                        for (int offset = 1; _task.Substring(Index + offset - 1, 1) != ")"; offset++)
-                        {
-                            if (_task.Substring(Index + offset, 1) == ")")
-                            {
-                                Console.WriteLine("Task in brackets: " + _task.Substring(Index + 1, offset - 1));
-                                //Console.WriteLine("Result of task in brackets: " + CalculateString(_task.Substring(Index + 1, offset - 1)).ToString());
+                        double Number1 = 0;
+                        double Number2 = 0;
 
-                                string taskPart1 = _task.Substring(0, Index);
-                                string taskPart2 = CalculateString(_task.Substring(Index + 1, offset - 1)).ToString();
-                                string taskPart3 = _task.Substring(Index + offset, _task.Length - (Index + offset + 1));
+                        string[] splitted = intermediateTask2.Split('/');
 
-                                _task = taskPart1 + taskPart2 + taskPart3;
-                                break;
-                                //Console.WriteLine(taskPart1 + taskPart2 + taskPart3);
-                            }
-                        }
-                        break;
+                        Number1 = double.Parse(splitted[0]);
+                        Number2 = double.Parse(splitted[1]);
+
+                        _task = _task.Replace(intermediateTask2, (Number1 / Number2).ToString());
+                    }
+                    else if (intermediateTask2.Contains("*"))
+                    {
+                        double Number1 = 0;
+                        double Number2 = 0;
+
+                        string[] splitted = intermediateTask2.Split('*');
+
+                        Number1 = double.Parse(splitted[0]);
+                        Number2 = double.Parse(splitted[1]);
+
+                        _task = _task.Replace(intermediateTask2, (Number1 * Number2).ToString());
                     }
                 }
-            }
 
-            while (_task.Contains("*") || _task.Contains("/"))
-            {
-                for (int Index = 0; Index < _task.Length; Index++)
+                regex = new Regex(@"(\d{1,}[\+\-]\d{1,})");
+                intermediateTask2 = regex.Match(_task).ToString();
+
+                while (_task.Contains('-') || _task.Contains('+'))
                 {
-                    #region "Multiply"
-                    if (_task.Substring(Index, 1) == "*")
+                    if (intermediateTask2.Contains("+"))
                     {
-                        int offsetRight = 0;
-                        int offsetLeft = 0;
-
-                        double interimResult = 0;
-
                         double Number1 = 0;
                         double Number2 = 0;
 
-                        for (int offset = 1; offset < _task.Length; offset++)
-                        {
-                            if (Index + offset + 1 != _task.Length)
-                            {
-                                string pieceOfTask = _task.Substring(Index + offset + 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || offset + 1 == _task.Length - Index)
-                                {
-                                    offsetRight = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetRight = offset;
-                                break;
-                            }
-                        }
+                        string[] splitted = intermediateTask2.Split('+');
 
-                        for (int offset = 1; Index - offset >= 0; offset++)
-                        {
-                            if (Index - offset - 1 != -1)
-                            {
-                                string pieceOfTask = _task.Substring(Index - offset - 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || Index - offset == 0)
-                                {
-                                    offsetLeft = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetLeft = offset;
-                                break;
-                            }
-                        }
+                        Number1 = double.Parse(splitted[0]);
+                        Number2 = double.Parse(splitted[1]);
 
-                        string n1 = _task.Substring(Index - offsetLeft, offsetLeft);
-                        string n2 = _task.Substring(Index + 1, offsetRight);
-
-                        if (n2.EndsWith(")")) n2 = n2.Substring(0, n2.Length - 1);
-
-                        Number1 = double.Parse(n1);
-                        Number2 = double.Parse(n2);
-
-                        interimResult = Number1 * Number2;
-
-                        string taskPart1 = _task.Substring(0, Index - offsetLeft);
-                        string taskPart2 = _task.Substring(Index + offsetRight + 1, (_task.Length - 1) - (Index + offsetRight));
-
-                        _task = taskPart1 + interimResult.ToString() + taskPart2;
-                        break;
+                        _task = _task.Replace(intermediateTask2, (Number1 + Number2).ToString());
                     }
-                    #endregion
-                    #region "Divide"
-                    else if (_task.Substring(Index, 1) == "/")
+                    else if (intermediateTask2.Contains("-"))
                     {
-                        int offsetRight = 0;
-                        int offsetLeft = 0;
-
-                        double interimResult = 0;
-
                         double Number1 = 0;
                         double Number2 = 0;
 
-                        for (int offset = 1; offset < _task.Length; offset++)
-                        {
-                            if (Index + offset + 1 != _task.Length)
-                            {
-                                string pieceOfTask = _task.Substring(Index + offset + 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || offset + 1 == _task.Length - Index)
-                                {
-                                    offsetRight = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetRight = offset;
-                                break;
-                            }
-                        }
+                        string[] splitted = intermediateTask2.Split('-');
 
-                        for (int offset = 1; Index - offset >= 0; offset++)
-                        {
-                            if (Index - offset - 1 != -1)
-                            {
-                                string pieceOfTask = _task.Substring(Index - offset - 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || Index - offset == 0)
-                                {
-                                    offsetLeft = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetLeft = offset;
-                                break;
-                            }
-                        }
+                        Number1 = double.Parse(splitted[0]);
+                        Number2 = double.Parse(splitted[1]);
 
-                        string n1 = _task.Substring(Index - offsetLeft, offsetLeft);
-                        string n2 = _task.Substring(Index + 1, offsetRight);
-
-                        Number1 = double.Parse(n1);
-                        Number2 = double.Parse(n2);
-
-                        if (Number2 != 0)
-                        {
-                            interimResult = Number1 / Number2;
-
-                            string taskPart1 = _task.Substring(0, Index - offsetLeft);
-                            string taskPart2 = _task.Substring(Index + offsetRight + 1, (_task.Length - 1) - (Index + offsetRight));
-
-                            _task = taskPart1 + interimResult.ToString() + taskPart2;
-                        }
-                        else
-                            _task = "0";
-                        break;
+                        _task = _task.Replace(intermediateTask2, (Number1 - Number2).ToString());
                     }
-                    #endregion
                 }
+
+                return double.Parse(_task);
             }
-
-            while (_task.Contains("+") || _task.Contains("-"))
-            {
-                for (int Index = 0; Index < _task.Length; Index++)
-                {
-                    #region "Add"
-                    if (_task.Substring(Index, 1) == "+")
-                    {
-                        int offsetRight = 0;
-                        int offsetLeft = 0;
-
-                        double interimResult = 0;
-
-                        double Number1 = 0;
-                        double Number2 = 0;
-
-                        for (int offset = 1; offset < _task.Length; offset++)
-                        {
-                            if (Index + offset + 1 != _task.Length)
-                            {
-                                string pieceOfTask = _task.Substring(Index + offset + 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || offset + 1 == _task.Length - Index)
-                                {
-                                    offsetRight = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetRight = offset;
-                                break;
-                            }
-                        }
-
-                        for (int offset = 1; Index - offset >= 0; offset++)
-                        {
-                            if (Index - offset - 1 != -1)
-                            {
-                                string pieceOfTask = _task.Substring(Index - offset - 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || Index - offset == 0)
-                                {
-                                    offsetLeft = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetLeft = offset;
-                                break;
-                            }
-                        }
-
-                        string n1 = _task.Substring(Index - offsetLeft, offsetLeft);
-                        string n2 = _task.Substring(Index + 1, offsetRight);
-
-                        Number1 = double.Parse(n1);
-                        Number2 = double.Parse(n2);
-
-                        interimResult = Number1 + Number2;
-
-                        string taskPart1 = _task.Substring(0, Index - offsetLeft);
-                        string taskPart2 = _task.Substring(Index + offsetRight + 1, (_task.Length - 1) - (Index + offsetRight));
-
-                        _task = taskPart1 + interimResult.ToString() + taskPart2;
-                        break;
-                    }
-                    #endregion
-                    #region "Subtract"
-                    else if (_task.Substring(Index, 1) == "-")
-                    {
-                        int offsetRight = 0;
-                        int offsetLeft = 0;
-
-                        double interimResult = 0;
-
-                        double Number1 = 0;
-                        double Number2 = 0;
-
-                        for (int offset = 1; offset < _task.Length; offset++)
-                        {
-                            if (Index + offset + 1 != _task.Length)
-                            {
-                                string pieceOfTask = _task.Substring(Index + offset + 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || offset + 1 == _task.Length - Index)
-                                {
-                                    offsetRight = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetRight = offset;
-                                break;
-                            }
-                        }
-
-                        for (int offset = 1; Index - offset >= 0; offset++)
-                        {
-                            if (Index - offset - 1 != -1)
-                            {
-                                string pieceOfTask = _task.Substring(Index - offset - 1, 1);
-                                if (pieceOfTask == "*" || pieceOfTask == "/" || pieceOfTask == "+" || pieceOfTask == "-" || Index - offset == 0)
-                                {
-                                    offsetLeft = offset;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                offsetLeft = offset;
-                                break;
-                            }
-                        }
-
-                        string n1 = _task.Substring(Index - offsetLeft, offsetLeft);
-                        string n2 = _task.Substring(Index + 1, offsetRight);
-
-                        Number1 = double.Parse(n1);
-                        Number2 = double.Parse(n2);
-
-                        interimResult = Number1 - Number2;
-
-                        string taskPart1 = _task.Substring(0, Index - offsetLeft);
-                        string taskPart2 = _task.Substring(Index + offsetRight + 1, (_task.Length - 1) - (Index + offsetRight));
-
-                        _task = taskPart1 + interimResult.ToString() + taskPart2;
-                        break;
-                    }
-                    #endregion
-                }
-            }
-
-            if (_task == "") _task = "0";
-            Console.WriteLine("Result of the task:  " + _task);
-            _result = double.Parse(_task);
-            return _result;
-        }
     }
