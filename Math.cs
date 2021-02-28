@@ -31,6 +31,19 @@ class Math
                         return (celsius * (9/5)) + 32;
                     }
                 }
+
+                public static class Fahrenheit
+                {
+                    public static double ToKelvin(double fahrenheit)
+                    {
+                        return (fahrenheit - 32 / 1.8) - 273.15;
+                    }
+
+                    public static double ToCelsius(double fahrenheit)
+                    {
+                        return fahrenheit - 32 / 1.8;
+                    }
+                }
             }
         }
 
