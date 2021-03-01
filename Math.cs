@@ -51,7 +51,7 @@ class Math
     public static double CalculateString(string task)
     {
         string _task = task;
-        Regex regex = new Regex(@"(\((\d{1,}[+\/\-\*]\d{1,})\))(?!.*\1)");
+        Regex regex = new Regex(@"(\([0-9,\+\-\*\/]{1,}\))(?!.*\1)");
 
         while (regex.IsMatch(_task))
         {
@@ -59,7 +59,7 @@ class Math
             _task = _task.Replace(intermediateTask, CalculateString(intermediateTask.Substring(1, intermediateTask.Length - 2)).ToString());
         }
 
-        regex = new Regex(@"(\d{1,}[\/\*]\d{1,})");
+        regex = new Regex(@"(([^0-9]\-(\d{1,},\d{1,}|\d{1,})|(\d{1,},\d{1,}|\d{1,}))[\/\*](\-(\d{1,},\d{1,}|\d{1,})|(\d{1,},\d{1,}|\d{1,})))");
         string intermediateTask2 = regex.Match(_task).ToString();
 
         while (_task.Contains('*') || _task.Contains('/'))
@@ -71,6 +71,9 @@ class Math
 
                 string[] splitted = intermediateTask2.Split('/');
 
+                if (splitted[0].Substring(0, 1) == "(" || splitted[0].Substring(0, 1) == "+" || splitted[0].Substring(0, 2) == "--") splitted[0] = splitted[0].Substring(1);
+                if (intermediateTask2.Substring(0, 1) == "(" || intermediateTask2.Substring(0, 1) == "+" || intermediateTask2.Substring(0, 2) == "--") intermediateTask2 = intermediateTask2.Substring(1);
+
                 Number1 = double.Parse(splitted[0]);
                 Number2 = double.Parse(splitted[1]);
 
@@ -78,6 +81,8 @@ class Math
                     _task = _task.Replace(intermediateTask2, (Number1 / Number2).ToString());
                 else
                     _task = _task.Replace(intermediateTask2, (0).ToString());
+
+                intermediateTask2 = regex.Match(_task).ToString();
             }
             else if (intermediateTask2.Contains("*"))
             {
@@ -86,41 +91,59 @@ class Math
 
                 string[] splitted = intermediateTask2.Split('*');
 
+                if (splitted[0].Substring(0, 1) == "(" || splitted[0].Substring(0, 1) == "+" || splitted[0].Substring(0, 2) == "--") splitted[0] = splitted[0].Substring(1);
+
                 Number1 = double.Parse(splitted[0]);
                 Number2 = double.Parse(splitted[1]);
 
                 _task = _task.Replace(intermediateTask2, (Number1 * Number2).ToString());
+
+                intermediateTask2 = regex.Match(_task).ToString();
             }
         }
 
-        regex = new Regex(@"(\d{1,}[\+\-]\d{1,})");
+        regex = new Regex(@"((\-(\d{1,},\d{1,}|\d{1,})|(\d{1,},\d{1,}|\d{1,}))[\+\-](\-(\d{1,},\d{1,}|\d{1,})|(\d{1,},\d{1,}|\d{1,})))");
         intermediateTask2 = regex.Match(_task).ToString();
 
-        while (_task.Contains('-') || _task.Contains('+'))
+        if (!new Regex(@"^\d+$").IsMatch(_task.Substring(1)))
         {
-            if (intermediateTask2.Contains("+"))
+            while ((_task.Contains('-') || _task.Contains('+')) && !new Regex(@"^\d+$").IsMatch(_task.Substring(1)))
             {
-                double Number1 = 0;
-                double Number2 = 0;
+                if (intermediateTask2.Contains("+"))
+                {
+                    double Number1 = 0;
+                    double Number2 = 0;
 
-                string[] splitted = intermediateTask2.Split('+');
+                    string[] splitted = intermediateTask2.Split('+');
 
-                Number1 = double.Parse(splitted[0]);
-                Number2 = double.Parse(splitted[1]);
+                    if (splitted[0].Substring(0, 1) == "(") splitted[0] = splitted[0].Substring(1);
 
-                _task = _task.Replace(intermediateTask2, (Number1 + Number2).ToString());
-            }
-            else if (intermediateTask2.Contains("-"))
-            {
-                double Number1 = 0;
-                double Number2 = 0;
+                    Number1 = double.Parse(splitted[0]);
+                    Number2 = double.Parse(splitted[1]);
 
-                string[] splitted = intermediateTask2.Split('-');
+                    _task = _task.Replace(intermediateTask2, (Number1 + Number2).ToString());
 
-                Number1 = double.Parse(splitted[0]);
-                Number2 = double.Parse(splitted[1]);
+                    intermediateTask2 = regex.Match(_task).ToString();
+                }
+                else if (intermediateTask2.Contains("-"))
+                {
+                    double Number1 = 0;
+                    double Number2 = 0;
 
-                _task = _task.Replace(intermediateTask2, (Number1 - Number2).ToString());
+                    string[] splitted = intermediateTask2.Split('-');
+
+                    if (splitted[0] != "" && splitted[0].Substring(0, 1) == "(") splitted[0] = splitted[0].Substring(1);
+
+                    if (splitted[0] == "") Number1 = -double.Parse(splitted[1]);
+                    else Number1 = double.Parse(splitted[0]);
+                    if (splitted.Count() == 4) Number2 = -double.Parse(splitted[3]);
+                    else if (splitted[0] != "" && splitted.Count() == 3) Number2 = -double.Parse(splitted[2]);
+                    else Number2 = double.Parse(splitted[1]);
+
+                    _task = _task.Replace(intermediateTask2, (Number1 - Number2).ToString());
+
+                    intermediateTask2 = regex.Match(_task).ToString();
+                }
             }
         }
 
