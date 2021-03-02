@@ -1,0 +1,84 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="CheckedBlue" Color="#009688"/>
+    <SolidColorBrush x:Key="UncheckedBlue" Color="#F1F1F1"/>
+
+    <SolidColorBrush x:Key="CheckedStroke" Color="#019184"/>
+    <SolidColorBrush x:Key="UncheckedStroke" Color="#EAEAEA"/>
+
+    <SolidColorBrush x:Key="DisabledSliderBackground" Color="#B9B8B8"/>
+    <SolidColorBrush x:Key="EnabledSliderBackground" Color="#77C2BB"/>
+
+    <Style x:Key="SwitchStyle" TargetType="{x:Type CheckBox}">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <ControlTemplate.Resources>
+                        <Storyboard x:Key="OnChecking">
+                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="slider" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(TranslateTransform.X)">
+                                <SplineDoubleKeyFrame KeyTime="00:00:00.2" Value="30"/>
+                            </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="OnUnchecking">
+                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="slider" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(TranslateTransform.X)">
+                                <SplineDoubleKeyFrame KeyTime="00:00:00.2" Value="0"/>
+                            </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </ControlTemplate.Resources>
+                    <DockPanel>
+                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Content="{TemplateBinding Content}" 
+                                              ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                              RecognizesAccessKey="True" VerticalAlignment="Center" Margin="5"/>
+                        <Grid>
+                            <Border x:Name="BackgroundBorder" Background="{StaticResource DisabledSliderBackground}" BorderThickness="0" CornerRadius="12" Height="23" Width="58" Margin="1,0,0,1"/>
+                            <Ellipse Fill="{StaticResource UncheckedBlue}" Stroke="{StaticResource UncheckedStroke}"  HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="slider" Width="30" Height="30" RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <TransformGroup>
+                                        <TranslateTransform X="0" Y="0"/>
+                                    </TransformGroup>
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Effect>
+                                    <DropShadowEffect BlurRadius="5" ShadowDepth="2" Opacity="0.3" RenderingBias="Quality"/>
+                                </Ellipse.Effect>
+
+                            </Ellipse>
+                        </Grid>
+                    </DockPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Trigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource OnUnchecking}"/>
+                            </Trigger.ExitActions>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource OnChecking}"/>
+                            </Trigger.EnterActions>
+                            <Setter TargetName="slider" Property="Fill" Value="{StaticResource CheckedBlue}"/>
+                            <Setter TargetName="slider" Property="Stroke" Value="{StaticResource CheckedStroke}"/>
+                            <Setter TargetName="BackgroundBorder" Property="Background" Value="{StaticResource EnabledSliderBackground}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="slider" Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform X="15"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="slider" Property="Fill" Value="{StaticResource UncheckedBlue}"/>
+                            <Setter TargetName="slider" Property="Stroke" Value="{StaticResource UncheckedStroke}"/>
+                            <Setter TargetName="BackgroundBorder" Property="Background" Value="{StaticResource DisabledSliderBackground}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="BackgroundBorder" Property="Opacity" Value="0.3"/>
+                            <Setter TargetName="slider" Property="Fill" Value="{StaticResource UncheckedBlue}"/>
+                            <Setter TargetName="slider" Property="Stroke" Value="{StaticResource UncheckedStroke}"/>
+                            <Setter TargetName="BackgroundBorder" Property="Background" Value="{StaticResource DisabledSliderBackground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
